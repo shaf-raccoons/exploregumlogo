@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Palette Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@500;700&family=Archivo:wght@600;800&family=Playfair+Display:wght@600;700&family=DM+Serif+Display&family=Poppins:wght@500;700&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F2EF; --panel:#FFFFFF; --line:#E2E0DB; --ink:#1B1B18; --mut:#8B887F;
+  --disp:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh;
+  background-image:radial-gradient(circle,#D8D5CE 1px,transparent 1px);background-size:22px 22px}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.bar{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;flex-wrap:wrap}
+.bar-title{flex:1;min-width:180px}
+.bar-title h1{font-family:var(--disp);font-size:16px;font-weight:700;letter-spacing:-.01em}
+.bar-title p{color:var(--mut);font-size:12px;margin-top:1px}
+.bar-actions{display:flex;gap:8px;align-items:center}
+.bar-wm{display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line);border-radius:99px;background:#FBFAF8}
+.bar-wm-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.bar-wm input[type=text]{width:96px;border:none;background:none;font-size:13px;font-weight:600;color:var(--ink);padding:0}
+.bar-wm input[type=text]:focus{outline:none}
+.bar-wm select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12px;background:#fff;max-width:150px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 16px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+
+.wrap{max-width:none;width:100%;margin:0;padding:22px 32px 90px}
+.grid{display:flex;flex-direction:column;gap:14px}
+
+.state{border:1.5px dashed var(--line);border-radius:18px;background:rgba(255,255,255,.6);
+  padding:64px 24px;text-align:center;color:var(--mut)}
+.state strong{display:block;font-family:var(--disp);font-size:17px;color:var(--ink);margin-bottom:6px}
+.state code{font-family:var(--mono);font-size:12px;background:#EDEBE6;padding:2px 6px;border-radius:5px;color:var(--ink)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(20,18,12,.05),0 10px 28px -14px rgba(20,18,12,.15)}
+.card-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.card-head .nm{flex:1;min-width:0;font-family:var(--disp);font-weight:700;font-size:14px;color:var(--ink)}
+.card-head .fn{font-family:var(--mono);font-size:10px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
+
+.show{display:flex;flex-direction:row}
+.tile{flex:1;min-width:0;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.tile:last-child{border-right:none}
+.stage{flex:1;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px 16px}
+.stage img,.stage svg{max-width:70%;max-height:60px;width:auto;height:auto;object-fit:contain}
+.stage svg{overflow:visible}
+.stage .wm{font-family:'Inter',sans-serif;font-weight:700;font-size:16px;letter-spacing:.04em;line-height:1;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.tile-ctl{border-top:1px solid var(--line);background:var(--panel);padding:9px 10px;display:flex;flex-direction:column;gap:8px}
+.ctl-line{display:flex;align-items:center;gap:8px}
+.ctl-line .lbl{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);width:34px;flex-shrink:0}
+.dots{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.dot{position:relative;width:24px;height:24px;border-radius:7px;border:1px solid rgba(0,0,0,.14);overflow:hidden;flex-shrink:0}
+.dot input{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);border:none;padding:0;cursor:pointer}
+.reset-tile{border:none;background:none;font-size:12px;color:var(--mut);padding:2px;line-height:1}
+.reset-tile:hover{color:var(--ink)}
+.hexline{font-family:var(--mono);font-size:9px;color:var(--mut)}
+
+.note{max-width:none;margin:20px 0 0;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+@media(max-width:720px){.show{flex-direction:column}.tile{border-right:none;border-bottom:1px solid var(--line)}.tile:last-child{border-bottom:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-title">
+    <h1 id="boardName">Logo Palette Board</h1>
+    <p>Recolor the tiles and edit the wordmark to explore. Your changes stay in this browser session.</p>
+  </div>
+  <div class="bar-wm">
+    <span class="bar-wm-lbl">Wordmark</span>
+    <input type="text" id="wmText" value="GUM" aria-label="Wordmark text" spellcheck="false">
+    <select id="wmFont" aria-label="Wordmark font">
+      <option value="'Inter',sans-serif" selected>Inter</option>
+      <option value="'Space Grotesk',sans-serif">Space Grotesk</option>
+      <option value="'DM Sans',sans-serif">DM Sans</option>
+      <option value="'Archivo',sans-serif">Archivo</option>
+      <option value="'Poppins',sans-serif">Poppins</option>
+      <option value="'Montserrat',sans-serif">Montserrat</option>
+      <option value="'Playfair Display',serif">Playfair Display</option>
+      <option value="'DM Serif Display',serif">DM Serif Display</option>
+      <option value="'IBM Plex Mono',monospace">IBM Plex Mono</option>
+    </select>
+  </div>
+  <div class="bar-actions">
+    <button class="btn" id="resetBtn">Reset my changes</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid" id="grid">
+    <div class="state" id="state"><strong>Loading logos…</strong>Reading the <code>logos/</code> folder.</div>
+  </div>
+</main>
+<p class="note">Logos are served from the /logos folder · edits run locally in the browser</p>
+
+<script>
+const $=s=>document.querySelector(s);
+const grid=$('#grid');
+let count=0, saveTimer=null, SESSION_KEY='lpb:board';
+
+const lum=h=>{const n=parseInt(h.slice(1),16);return((n>>16&255)*.299+(n>>8&255)*.587+(n&255)*.114)/255;};
+const encodeB64=s=>btoa(unescape(encodeURIComponent(s)));
+const decodeB64=s=>decodeURIComponent(escape(atob(s)));
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+let wmText=$('#wmText').value;
+let wmFont=$('#wmFont').value;
+
+const normColor=(()=>{
+  const c=document.createElement('canvas').getContext('2d');
+  return v=>{
+    if(!v)return null; v=String(v).trim();
+    if(/^(none|transparent|inherit|currentcolor)$/i.test(v)||v.startsWith('url'))return null;
+    try{ c.fillStyle='#010203'; c.fillStyle=v; const out=c.fillStyle;
+      return /^#[0-9a-f]{6}$/i.test(out)?out.toLowerCase():null; }catch(e){ return null; }
+  };
+})();
+
+function prepSvg(text){
+  const doc=new DOMParser().parseFromString(text,'image/svg+xml');
+  const svg=doc.querySelector('svg');
+  if(!svg||doc.querySelector('parsererror'))return null;
+  if(!svg.getAttribute('viewBox')){
+    const w=parseFloat(svg.getAttribute('width')),h=parseFloat(svg.getAttribute('height'));
+    if(w&&h)svg.setAttribute('viewBox','0 0 '+w+' '+h);
+  }
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  svg.querySelectorAll('script').forEach(s=>s.remove());
+  return svg;
+}
+
+const SHAPES='path,rect,circle,ellipse,polygon,polyline,line,text,tspan';
+function extractGroups(svg){
+  const groups=[]; const idx={};
+  const gid=col=>{ if(idx[col]==null){ idx[col]=groups.length; groups.push(col); } return idx[col]; };
+  svg.querySelectorAll(SHAPES).forEach(el=>{
+    if(el.closest('defs,clipPath,mask'))return;
+    let f=el.style.fill||el.getAttribute('fill');
+    if(f==null){ const anc=el.closest('[fill],[style*="fill"]');
+      f=anc?(anc.style&&anc.style.fill)||anc.getAttribute('fill'):'#000000'; }
+    const fn=normColor(f);
+    if(fn)el.setAttribute('data-fg',gid(fn));
+    let s=el.style.stroke||el.getAttribute('stroke');
+    if(s==null){ const anc=el.closest('[stroke],[style*="stroke"]'); s=anc?(anc.style&&anc.style.stroke)||anc.getAttribute('stroke'):null; }
+    const sn=normColor(s);
+    if(sn)el.setAttribute('data-sg',gid(sn));
+  });
+  return groups;
+}
+
+const TILES=[
+  {label:'Light',   bg:'#FFFFFF'},
+  {label:'Primary', bg:'#4F46E5'},
+  {label:'Dark',    bg:'#111827'},
+];
+
+function relabel(){
+  Array.from(grid.querySelectorAll('.card .nm')).forEach((el,i)=>{el.textContent='Logo '+(i+1);});
+}
+
+/* opts: {src|svgNode, filename} */
+function addCard(opts){
+  count++;
+  const src=opts.src, svgNode=opts.svgNode, filename=opts.filename||'';
+  const isSvg=!!svgNode;
+  let originals=[];
+  if(isSvg){ originals=extractGroups(svgNode); if(originals.length>8)originals=originals.slice(0,8); }
+
+  const tiles=TILES.map(t=>({label:t.label, bg:t.bg, logo:originals.slice()}));
+
+  const card=document.createElement('article');
+  card.className='card';
+  card._tiles=tiles;
+
+  const tileHtml=tiles.map((t,ti)=>
+    '<div class="tile" data-ti="'+ti+'">'+
+      '<div class="stage"><span class="wm">'+esc(wmText)+'</span></div>'+
+      '<div class="tile-ctl">'+
+        '<div class="ctl-line">'+
+          '<span class="lbl">BG</span>'+
+          '<span class="dot"><input type="color" value="'+t.bg+'" data-bg="'+ti+'" aria-label="'+t.label+' background"></span>'+
+          '<span class="hexline" data-bghex="'+ti+'">'+t.bg.toUpperCase()+'</span>'+
+          '<span style="flex:1"></span>'+
+          (isSvg?'<button class="reset-tile" data-reset="'+ti+'" title="Reset logo colors">&#8634;</button>':'')+
+        '</div>'+
+        (isSvg&&originals.length?
+        '<div class="ctl-line">'+
+          '<span class="lbl">Logo</span>'+
+          '<span class="dots">'+originals.map((c,ci)=>
+            '<span class="dot"><input type="color" value="'+c+'" data-lc="'+ti+'-'+ci+'" aria-label="'+t.label+' logo color '+(ci+1)+'"></span>'
+          ).join('')+'</span>'+
+        '</div>':'')+
+      '</div>'+
+    '</div>'
+  ).join('');
+
+  card.innerHTML=
+    '<div class="card-head">'+
+      '<span class="nm">Logo</span>'+
+      '<span class="fn">'+esc(filename)+'</span>'+
+    '</div>'+
+    '<div class="show">'+tileHtml+'</div>';
+
+  card.querySelectorAll('.stage').forEach(stage=>{
+    const wm=stage.querySelector('.wm');
+    wm.style.fontFamily=wmFont;
+    if(isSvg)stage.insertBefore(svgNode.cloneNode(true),wm);
+    else{ const img=document.createElement('img'); img.src=src; img.alt=''; stage.insertBefore(img,wm); }
+  });
+
+  function paintBg(ti){
+    const t=tiles[ti];
+    const stage=card.querySelector('.tile[data-ti="'+ti+'"] .stage');
+    stage.style.background=t.bg;
+    stage.style.color=lum(t.bg)>.62?'#111':'#fff';
+    const bi=card.querySelector('[data-bg="'+ti+'"]'); if(bi)bi.value=t.bg;
+    const bh=card.querySelector('[data-bghex="'+ti+'"]'); if(bh)bh.textContent=t.bg.toUpperCase();
+  }
+  function paintLogo(ti,ci){
+    const col=tiles[ti].logo[ci]; if(col==null)return;
+    const stage=card.querySelector('.tile[data-ti="'+ti+'"] .stage');
+    stage.querySelectorAll('[data-fg="'+ci+'"]').forEach(el=>{el.style.setProperty('fill',col,'important');el.setAttribute('fill',col);});
+    stage.querySelectorAll('[data-sg="'+ci+'"]').forEach(el=>{el.style.setProperty('stroke',col,'important');el.setAttribute('stroke',col);});
+    const inp=card.querySelector('[data-lc="'+ti+'-'+ci+'"]'); if(inp)inp.value=col;
+  }
+  card._repaint=()=>{ tiles.forEach((t,ti)=>{ paintBg(ti); t.logo.forEach((_,ci)=>paintLogo(ti,ci)); }); };
+
+  card.addEventListener('input',e=>{
+    const t=e.target;
+    if(t.dataset.bg!=null){ const ti=+t.dataset.bg; tiles[ti].bg=t.value; paintBg(ti); }
+    else if(t.dataset.lc!=null){ const p=t.dataset.lc.split('-').map(Number); tiles[p[0]].logo[p[1]]=t.value; paintLogo(p[0],p[1]); }
+    scheduleSave();
+  });
+  card.querySelectorAll('[data-reset]').forEach(btn=>btn.addEventListener('click',()=>{
+    const ti=+btn.dataset.reset; tiles[ti].logo=originals.slice(); originals.forEach((_,ci)=>paintLogo(ti,ci)); scheduleSave();
+  }));
+
+  card._repaint();
+  grid.appendChild(card);
+  relabel();
+  return card;
+}
+
+/* ---- state / persistence ---- */
+function boardConfig(){
+  return {
+    wm:{text:wmText,font:wmFont},
+    cards:Array.from(grid.querySelectorAll('.card')).map(card=>({
+      tiles:card._tiles.map(t=>({bg:t.bg, logo:t.logo.slice()}))
+    }))
+  };
+}
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveSession,250); }
+function saveSession(){ try{ sessionStorage.setItem(SESSION_KEY, encodeB64(JSON.stringify(boardConfig()))); }catch(e){} }
+function loadSession(){ try{ const v=sessionStorage.getItem(SESSION_KEY); return v?JSON.parse(decodeB64(v)):null; }catch(e){ return null; } }
+function applyWm(wm){
+  if(!wm)return;
+  wmText=wm.text; wmFont=wm.font;
+  $('#wmText').value=wmText; $('#wmFont').value=wmFont;
+  document.querySelectorAll('.card .stage .wm').forEach(w=>{w.textContent=wmText;w.style.fontFamily=wmFont;});
+}
+function applySaved(saved){
+  const cards=Array.from(grid.querySelectorAll('.card'));
+  (saved.cards||[]).forEach((sc,i)=>{
+    const card=cards[i]; if(!card)return;
+    (sc.tiles||[]).forEach((st,ti)=>{
+      if(!card._tiles[ti])return;
+      if(st.bg)card._tiles[ti].bg=st.bg;
+      if(st.logo)card._tiles[ti].logo=st.logo.slice();
+    });
+    card._repaint();
+  });
+}
+
+/* ---- load logos from the /logos folder ---- */
+async function fetchText(url){ const r=await fetch(url,{cache:'no-store'}); if(!r.ok)throw new Error(r.status); return r.text(); }
+
+async function loadFolder(){
+  let files=[];
+  try{
+    const res=await fetch('logos/manifest.json',{cache:'no-store'});
+    if(res.ok){ const j=await res.json(); files=Array.isArray(j)?j:(j.logos||[]); }
+  }catch(e){}
+  const state=$('#state');
+  if(!files.length){
+    if(state)state.innerHTML='<strong>No logos found</strong>Add .svg / .png / .jpg files to the <code>logos/</code> folder and redeploy.';
+    return;
+  }
+  if(state)state.remove();
+  SESSION_KEY='lpb:'+encodeB64(files.join('|'));
+
+  for(const name of files){
+    const url='logos/'+name;
+    if(/\.svg$/i.test(name)){
+      try{ const t=await fetchText(url); const node=prepSvg(t); if(node)addCard({svgNode:node,filename:name}); else addCard({src:url,filename:name}); }
+      catch(e){ addCard({src:url,filename:name}); }
+    }else{
+      addCard({src:url,filename:name});
+    }
+  }
+
+  const saved=loadSession();
+  if(saved){ applyWm(saved.wm); applySaved(saved); }
+}
+
+/* ---- global controls ---- */
+$('#wmText').addEventListener('input',e=>{
+  wmText=e.target.value;
+  document.querySelectorAll('.card .stage .wm').forEach(w=>w.textContent=wmText);
+  scheduleSave();
+});
+$('#wmFont').addEventListener('change',e=>{
+  wmFont=e.target.value;
+  document.querySelectorAll('.card .stage .wm').forEach(w=>w.style.fontFamily=wmFont);
+  scheduleSave();
+});
+$('#resetBtn').addEventListener('click',()=>{
+  try{ sessionStorage.removeItem(SESSION_KEY); }catch(e){}
+  location.reload();
+});
+
+loadFolder();
+</script>
+</body>
+</html>
